@@ -46,6 +46,8 @@ log_level="${!log}"
 mkdir -p "${apicast_dir}/logs"
 
 daemon=off
+worker_processes=auto
+master=on
 
 usage () {
 	cat <<-USAGE
@@ -56,10 +58,12 @@ usage () {
 	  -v Increase verbosity (can be repeated)
 	  -i Auto update interval in seconds.
 	  -r Reload configuration on every request. WARNING: not for production. It has to download configuration on every request.
+	  -w <workers> Number of worker processes to start.
+	  -m <on|off> Whether to start worker processes. Only for development.
 USAGE
 }
 
-while getopts ":dc:hvqi:r" opt; do
+while getopts ":dc:hvqi:rw:m:" opt; do
   case "${opt}" in
     d)
       daemon=on
@@ -79,6 +83,12 @@ while getopts ":dc:hvqi:r" opt; do
     i)
       export AUTO_UPDATE_INTERVAL="${OPTARG}"
     ;;
+    w)
+      worker_processes="${OPTARG}"
+    ;;
+    m)
+      master="${OPTARG}"
+    ;;
     h)
       usage
       exit 0
@@ -92,4 +102,4 @@ while getopts ":dc:hvqi:r" opt; do
   esac
 done
 
-exec "${openresty_binary}" -p "${apicast_dir}" -c conf/nginx.conf -g "daemon ${daemon}; error_log ${log_file} ${log_levels[log_level]};"
+exec "${openresty_binary}" -p "${apicast_dir}" -c conf/nginx.conf -g "daemon ${daemon}; master_process ${master}; worker_processes ${worker_processes}; error_log ${log_file} ${log_levels[log_level]};"
