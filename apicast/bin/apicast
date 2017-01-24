@@ -61,13 +61,14 @@ usage () {
 	  -w <workers> Number of worker processes to start.
 	  -m <on|off> Whether to start worker processes. Only for development.
 	  -s <signal> Send signal to a master process: stop, quit, reopen, reload
+	  -p <pid> Path to the PID file.
 USAGE
 }
 
 main=("")
 args=("")
 
-while getopts ":dc:hvqi:rw:m:s:" opt; do
+while getopts ":dc:hvqi:rw:m:s:p:" opt; do
   case "${opt}" in
     d)
       main+=("daemon on;")
@@ -92,6 +93,9 @@ while getopts ":dc:hvqi:rw:m:s:" opt; do
     ;;
     m)
       main+=("master_process ${OPTARG};")
+    ;;
+    p)
+      main+=("pid ${PWD}/${OPTARG};")
     ;;
     s)
       args+=("-s" "${OPTARG}")
