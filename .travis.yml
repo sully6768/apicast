@@ -36,6 +36,7 @@ before_install:
 - travis/install-openresty.sh
 - travis/install-luarocks.sh
 - travis/install-s2i.sh
+- travis/install-stapxx.sh
 - find ${HOME}/openresty
 - eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
 - perl -MCarton -e'shell' 2>/dev/null || cpanm Carton
