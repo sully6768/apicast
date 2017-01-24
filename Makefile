@@ -76,6 +76,15 @@ test-builder-image: builder-image clean ## Smoke test the builder image. Pass an
 	$(DOCKER_COMPOSE) run --rm -e THREESCALE_PORTAL_ENDPOINT=https://echo-api.3scale.net gateway /opt/app/libexec/boot | grep 'APIcast/'
 	@echo -e $(SEPARATOR)
 
+tmp:
+	mkdir -p $@
+
+profile: tmp
+	bin/apicast -s stop -p tmp/apicast.pid || true
+	bin/apicast -m off -d -p tmp/apicast.pid
+	lj-lua-stacks.sxx --skip-badvars -x $(shell cat tmp/apicast.pid) --arg time=5
+	bin/apicast -s stop -p tmp/apicast.pid || true
+
 test-runtime-image: export IMAGE_NAME = apicast-release-test
 test-runtime-image: runtime-image clean ## Smoke test the runtime image. Pass any docker image in IMAGE_NAME parameter.
 	$(DOCKER_COMPOSE) run --rm --user 100001 gateway apicast -d
