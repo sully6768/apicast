@@ -65,6 +65,25 @@
       }
     },
     {
+      "kind": "PersistentVolume",
+      "metadata": {
+        "name": "pv${PV}"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce",
+          "ReadWriteMany"
+        ],
+        "capacity": {
+          "storage": "10Gi"
+        },
+        "persistentVolumeReclaimPolicy": "Recycle",
+        "hostPath": {
+          "path": "${PATH}/${PV}"
+        }
+      }
+    },
+    {
       "kind": "DeploymentConfig",
       "apiVersion": "v1",
       "metadata": {
