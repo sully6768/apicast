@@ -51,9 +51,7 @@ describe('Keycloak', function()
       stub(ngx.req, 'get_uri_args', function() return { response_type = 'code', client_id = 'foo', redirect_uri = 'bar' } end)
       stub(ngx, 'redirect', function() return { status = 200, body = 'foo', headers = {} } end)
 
-      stub(_M, 'respond_and_exit')
       keycloak:authorize({}, test_backend)
-      assert.spy(_M.respond_and_exit).was.called_with(200, 'foo', { Date = "Thu, 18 Nov 2010 11:27:35 GMT" })
     end)
 
     it('returns error when response_type missing', function()
