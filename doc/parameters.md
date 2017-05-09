@@ -145,6 +145,12 @@ URI that points to the realm configured on Red Hat Single Sign-On instance for 3
 
 **Example**: `https://rh-sso.example.com:8443/auth/realms/3scale`.
 
+### `OIDC_ENDPOINT`
+
+URI that points to the Issuer location for the OpenId Connect provider e.g  
+
+**Example**: `https://accounts.google.com` for https://accounts.google.com/.well-known/openid-configuration. 
+
 ### `OPENSSL_VERIFY`
 
 **Values:**

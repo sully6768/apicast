@@ -1,6 +1,7 @@
 local router = require 'router'
 local apicast_oauth = require 'oauth.apicast_oauth'
 local keycloak = require 'oauth.keycloak'
+local oidc = require 'oauth.oidc'
 
 local _M = {
   _VERSION = '0.0.2'
@@ -9,6 +10,8 @@ local _M = {
 function _M.new(configuration)
   if configuration.keycloak then
     return keycloak.new(configuration.keycloak)
+  elseif configuration.oidc then
+    return oidc.new(configuration.oidc)
   else
     return apicast_oauth.new()
   end

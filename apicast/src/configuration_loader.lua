@@ -8,6 +8,7 @@ local util = require 'util'
 local env = require('resty.env')
 local synchronization = require('resty.synchronization').new(1)
 local keycloak = require 'oauth.keycloak'
+local oidc = require 'oauth.oidc'
 local cjson = require 'cjson'
 
 local error = error
@@ -122,6 +123,18 @@ function boot.init(configuration)
       ngx.log(ngx.WARN, 'failed to load keycloak configuration, exiting (code ', code, ')\n',  err)
     end
   end
+
+  if oidc.enabled() then
+    local oidc_config
+    oidc_config, err, code = _M.run_external_command("oidc")
+    if oidc_config then
+      ngx.log(ngx.DEBUG, 'downloaded oidc configuration: ', oidc_config)
+      configuration.oidc = cjson.decode(oidc_config)
+    else
+      -- TODO: consider exiting if there is problem with oidc configuration
+      ngx.log(ngx.WARN, 'failed to load oidc configuration, exiting (code ', code, ')\n',  err)
+    end
+  end  
 end
 
 local function refresh_configuration(configuration)
@@ -174,9 +187,14 @@ local lazy = { init_worker = noop }
 
 function lazy.init(configuration)
   local keycloak_config = _M.run_external_command("keycloak")
+  local oidc_config = _M.run_external_command("oidc")
 
   if keycloak_config then
     configuration.keycloak = cjson.decode(keycloak_config)
+  end
+
+  if oidc_config then
+    configuration.oidc = cjson.decode(oidc_config)
   end
 
   configuration.configured = true
@@ -202,6 +220,7 @@ function lazy.rewrite(configuration, host)
   end
 
   configuration.keycloak = keycloak.load_configuration()
+  configuration.oidc = oidc.load_configuration()
 
   if ok then
     synchronization:release(host)
