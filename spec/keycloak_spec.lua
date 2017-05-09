@@ -49,9 +49,7 @@ describe('Keycloak', function()
 
       ngx.var = { is_args = "?", args = "client_id=foo" }
       stub(ngx.req, 'get_uri_args', function() return { response_type = 'code', client_id = 'foo', redirect_uri = 'bar' } end)
-
-      test_backend.expect{ url = 'http://www.example.com:80/auth/realms/test/protocol/openid-connect/auth?client_id=foo' }
-        .respond_with{ status = 200 , body = 'foo', headers = {} }
+      stub(ngx, 'redirect', function() return { status = 200, body = 'foo', headers = {} } end)
 
       stub(_M, 'respond_and_exit')
       keycloak:authorize({}, test_backend)
