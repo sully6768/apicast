@@ -237,7 +237,7 @@ function _M:authorize(service, client)
   end
 
   local url = resty_url.join(self.config.authorize_url, ngx.var.is_args, ngx.var.args)
-  ngx.redirect(url)
+  return ngx.redirect(url)
 end
 
 function _M:get_token(service, client)
