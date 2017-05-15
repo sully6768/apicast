@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+tmpfile=$(mktemp /tmp/abc-script.XXXXXX)
+exec 3>"$tmpfile"
+# rm "$tmpfile"
+
+cat << LUA >&3
+#!/usr/bin/env resty
+local templates = require('apicast.templates')
+
+print(templates.process("cli.tt2", { world = 'YAY' }))
+LUA
+
+exec resty "$tmpfile" "$@"
