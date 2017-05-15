@@ -1,16 +1,57 @@
-#!/usr/bin/env bash
-set -euo pipefail
-IFS=$'\n\t'
+#! /usr/bin/env resty
 
-tmpfile=$(mktemp /tmp/abc-script.XXXXXX)
-exec 3>"$tmpfile"
-# rm "$tmpfile"
+local datafile = require("datafile")
+local conf = datafile.path("conf", "r", "config")
 
-cat << LUA >&3
-#!/usr/bin/env resty
-local templates = require('apicast.templates')
+local function escape(...)
+  local command = type(...) == 'table' and ... or { ... }
+  for i, s in ipairs(command) do
+    s = (tostring(s) or ''):gsub('"', '\\"')
+    if s:find '[^A-Za-z0-9_."/-]' then
+      s = '"' .. s .. '"'
+    elseif s == '' then
+      s = '""'
+    end
+    command[i] = s
+  end
+  return table.concat(command, ' ')
+end
 
-print(templates.process("cli.tt2", { world = 'YAY' }))
-LUA
+local args = {}
 
-exec resty "$tmpfile" "$@"
+for i = 1, #arg do
+  table.insert(args, escape(arg[i]))
+end
+
+local _, apicast = datafile.open('apicast', 'r', 'config', function(path)
+  local f, err = io.open(path, "r")
+
+  if f then
+    local ok
+
+    ok, err = f:read(1)
+    f:close()
+
+    if ok then
+      return ok, path
+    end
+  end
+
+  return nil, err
+end)
+
+local cmd = string.format('%s %s', apicast or 'apicast', table.concat(args, ' '))
+
+if conf then
+  cmd = string.format('APICAST_DIR=%q %s', conf, cmd)
+end
+
+local ok, reason, number = os.execute(cmd)
+
+if ok then
+  os.exit(0)
+elseif reason == 'exit' then
+  os.exit(number)
+else
+  os.exit(number)
+end
