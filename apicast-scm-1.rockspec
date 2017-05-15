@@ -1,8 +1,8 @@
 package = "apicast"
 version = "scm-1"
 source = {
-   url = "apicast",
-   dir = 'apicast'
+   url = "git://github.com/3scale/apicast",
+   branch = 'luarock'
 }
 description = {
    detailed = "To learn more about deployment options, environments provided, and how to get started, go to the [APIcast overview](doc/overview.md).",
