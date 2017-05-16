@@ -73,4 +73,36 @@ describe('Configuration object', function()
     end)
   end)
 
+  describe('.get_redirect_url', function()
+    local get_redirect_url = configuration.get_redirect_url
+
+    it('fills in wildcard values', function()
+      local rule = { redirect_url = 'http://foo.bar/api/collection/{id}/item/{code}'}
+      local params = { id = 'one', code = 'two' }
+      ngx.var = { args = nil }
+      assert.equal('http://foo.bar/api/collection/one/item/two', get_redirect_url(rule, params))
+    end)
+
+    it('merges the query parameters when redirect_url has query parameters', function()
+      local rule = { redirect_url = 'http://foo.bar/api/collection/id?q=query'}
+      local params = {}
+      ngx.var = { args = 'param1=value1&param2=value2' }
+      assert.equal('http://foo.bar/api/collection/id?q=query&param1=value1&param2=value2', get_redirect_url(rule, params))
+    end)
+
+    it('merges the query parameters when redirect_url has no query parameters', function()
+      local rule = { redirect_url = 'http://foo.bar/api/collection/id'}
+      local params = {}
+      ngx.var = { args = 'param1=value1&param2=value2' }
+      assert.equal('http://foo.bar/api/collection/id?param1=value1&param2=value2', get_redirect_url(rule, params))
+    end)
+
+    it('merges the query parameters when there are no params in the request', function()
+      local rule = { redirect_url = 'http://foo.bar/api/collection/id?q=query'}
+      local params = {}
+      ngx.var = { args = nil }
+      assert.equal('http://foo.bar/api/collection/id?q=query', get_redirect_url(rule, params))
+    end)
+  end)
+
 end)
